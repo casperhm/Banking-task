@@ -2,13 +2,14 @@ import java.util.*;
 import java.io.*;
 
 public class App {
-    public static void main(String[] args) throws Exception {
-        clearScreen();
-        Scanner scanner = new Scanner(System.in);
-        /* Scan csv file to create initial accounts array */
-        ArrayList<Account> accounts = getAccounts();
 
-        /* Teller interface loop */
+    /**
+     * Teller interface, loop of choosing options
+     * 
+     * @param scanner
+     * @param accounts bankData.csv as ArrayList
+     */
+    public static void run(Scanner scanner, ArrayList<Account> accounts) {
         while (true) {
             /* Print UI */
             System.out.println("| * * Welcome Teller * * |");
@@ -17,6 +18,7 @@ public class App {
             System.out.println("Close account - 3");
             System.out.println("Get balance - 4");
             System.out.println("Alter balance - 5");
+            System.out.println("Save - 6");
 
             /* Temporarys */
             String name = null;
@@ -24,8 +26,13 @@ public class App {
             String number = null;
             String type = null;
 
+            /*
+             * Chose between view accounts, create new account, close account, get specific
+             * balance, alter balance, or save data
+             */
             switch (scanner.nextLine()) {
-                case "1": // view accounts
+                /* View accounts, just prints each account */
+                case "1":
                     clearScreen();
                     /* Print accounts array */
                     for (Account account : accounts) {
@@ -36,7 +43,11 @@ public class App {
                     scanner.nextLine();
                     clearScreen();
                     break;
-                case "2": // create new account
+                /*
+                 * Creates a new account with chosen name, adress, number, type and balance of
+                 * 0$
+                 */
+                case "2":
                     clearScreen();
                     /* Input details */
                     System.out.println("Input name");
@@ -86,8 +97,8 @@ public class App {
                     scanner.nextLine();
                     clearScreen();
                     break;
-
-                case "3": // close account
+                /* Search for an account by name and adress and delete it */
+                case "3":
                     boolean accountFound = false;
                     clearScreen();
                     System.out.println("Input name of account to be closed");
@@ -117,8 +128,8 @@ public class App {
                         clearScreen();
                     }
                     break;
-
-                case "4": // get balance
+                /* Search for an account by name and adress and print its balance */
+                case "4":
                     accountFound = false;
                     clearScreen();
                     System.out.println("Input name of account to get balance from");
@@ -147,6 +158,18 @@ public class App {
                         clearScreen();
                     }
                     break;
+                /* guh */
+                case "5":
+                    System.out.println("guh");
+                    break;
+                /* Save accounts to a new bankData.csv and delete the old one */
+                case "6":
+                    saveAccounts(accounts);
+                    clearScreen();
+                    System.out.println("Data saved");
+                    scanner.nextLine();
+                    clearScreen();
+                    break;
                 default: // invalid input
                     clearScreen();
                     System.out.println("Invalid input");
@@ -172,13 +195,41 @@ public class App {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] accountDetails = line.split(",");
-                accounts.add(0, new Account(accountDetails[0], accountDetails[1], accountDetails[2],
-                        accountDetails[3], accountDetails[4]));
+                accounts.add(0, new Account(accountDetails[0], accountDetails[1], accountDetails[2], accountDetails[3],
+                        accountDetails[4]));
             }
         } catch (Exception e) {
             System.out.println(e);
         }
         return accounts;
+    }
+
+    /**
+     * Removes and replaces bankData.csv with a blank bankData.csv, then fills it
+     * with the contents of accounts
+     * 
+     * @param accounts the accounts to save
+     */
+    public static void saveAccounts(ArrayList<Account> accounts) {
+        try {
+            /* Delete file and create blank replacement */
+            File file = new File("bankData.csv");
+            file.delete();
+            file.createNewFile(); // blank new csv
+
+            /* Save accounts to file */
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+            for (Account account : accounts) {
+                bw.write(Account.getCustomerName(account) + "," + Account.getAdress(account) + "," +
+                        Account.getAccountNumber(account) + "," + Account.getAccountType(account) + ","
+                        + Account.getBalance(account));
+                /* Insert return */
+                bw.newLine();
+            }
+            bw.close();
+        } catch (Exception e) {
+            System.out.println("e");
+        }
     }
 
     /**
@@ -189,4 +240,13 @@ public class App {
         System.out.flush();
     }
 
+    public static void main(String[] args) throws Exception {
+        clearScreen();
+        Scanner scanner = new Scanner(System.in);
+        /* Scan csv file to create initial accounts array */
+        ArrayList<Account> accounts = getAccounts();
+
+        /* Teller interface loop */
+        run(scanner, accounts);
+    }
 }
