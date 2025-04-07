@@ -46,18 +46,60 @@ public class App {
                 /*
                  * Creates a new account with chosen name, adress, number, type and balance of
                  * 0$
+                 * Check on each input for commas as these are the split regex
                  */
                 case "2":
                     clearScreen();
-                    /* Input details */
-                    System.out.println("Input name");
-                    name = scanner.nextLine();
+                    boolean hasComma = true;
+
+                    /* Input name */
+                    while (hasComma) {
+                        System.out.println("Input name");
+                        name = scanner.nextLine();
+                        /* Check for commas, these can break things */
+                        if (!name.contains(",")) {
+                            hasComma = false;
+                            break;
+                        }
+                        clearScreen();
+                        System.out.println("Please do not enter ,");
+                        scanner.nextLine();
+                        clearScreen();
+                    }
+                    hasComma = true;
                     clearScreen();
-                    System.out.println("Input adress");
-                    adress = scanner.nextLine();
+
+                    /* Input adress */
+                    while (hasComma) {
+                        System.out.println("Input adress");
+                        adress = scanner.nextLine();
+                        /* Check for commas, these can break things */
+                        if (!adress.contains(",")) {
+                            hasComma = false;
+                            break;
+                        }
+                        clearScreen();
+                        System.out.println("Please do not enter ,");
+                        scanner.nextLine();
+                        clearScreen();
+                    }
+                    hasComma = true;
                     clearScreen();
-                    System.out.println("Input phone number");
-                    number = scanner.nextLine();
+
+                    /* Input phone number */
+                    while (hasComma) {
+                        System.out.println("Input phone number");
+                        number = scanner.nextLine();
+                        /* Check for commas, these can break things */
+                        if (!number.contains(",")) {
+                            hasComma = false;
+                            break;
+                        }
+                        clearScreen();
+                        System.out.println("Please do not enter ,");
+                        scanner.nextLine();
+                        clearScreen();
+                    }
                     clearScreen();
 
                     /* Select valid type from Everyday, Savings, Current */
