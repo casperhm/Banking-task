@@ -50,4 +50,9 @@ public class Account {
     public static int getID(Account account) {
         return account.accountID;
     }
+
+    /* Setters */
+    public static void setBalance(Account account, double amount) {
+        account.balance += amount;
+    }
 }

@@ -213,13 +213,106 @@ public class App {
                     }
                     break;
                 /*
-                 * Alter balance
-                 * Deposit - can add any amount > 0 to account by accountID
-                 * Withdraw - remove any amount <= 5000 that leaves balance > 0, unless type
-                 * Current then >= -1000
+                 * Alter balance - search by accountID
+                 * Deposit - input any amount > 0
+                 * Withdraw - input any amount < 0 and >= -5000 that leaves balance >= 0 unless
+                 * type = Current then >= -1000
                  */
                 case "5":
-                    System.out.println("guh");
+                    clearScreen();
+                    /* Choose account by accountID */
+                    accountFound = false;
+                    clearScreen();
+                    System.out.println("Input account ID");
+                    ID = scanner.nextLine();
+                    clearScreen();
+
+                    /* Scan accounts for matches and remove if found */
+                    for (Account currentAccount : accounts) {
+                        if (Integer.toString(Account.getID(currentAccount)).equals(ID)) {
+                            /* Accounts match, input deposit/withdrawal */
+                            clearScreen();
+                            accountFound = true;
+                            System.out.println("Input deposit (+) or withdrawal (-)");
+                            System.out.println(
+                                    "Withdrawal limited to 5000$ and 1000$ overdraft applies only to Current accounts");
+
+                            /* Check for valid input */
+                            boolean validInput = false;
+                            double input = 0;
+                            while (!validInput) {
+                                if (scanner.hasNextDouble()) {
+                                    input = scanner.nextDouble();
+                                    clearScreen();
+                                    validInput = true;
+                                } else {
+                                    System.out.println("Please input a number");
+                                    scanner.nextLine();
+                                    clearScreen();
+                                }
+                            }
+
+                            /*
+                             * Alter balance for Current accounts
+                             * input > 0
+                             * input <= account balance
+                             */
+                            if (Account.getAccountType(currentAccount).equals("Current")) {
+                                if (input > 0
+                                        || (input < 0 && (Account.getBalance(currentAccount) + 1000) + input >= 0)) {
+                                    Account.setBalance(currentAccount, input);
+                                } else { // invalid input due to input == 0 or balance - input < -1000
+                                    if (input == 0) {
+                                        System.out.println("Cannot alter balance by 0");
+                                        scanner.nextLine();
+                                        clearScreen();
+                                        break;
+                                    } else { // overdraft limit exceded
+                                        System.out.println("This exceeds the overdraft limit of 1000$");
+                                        scanner.nextLine();
+                                        scanner.nextLine();
+                                        clearScreen();
+                                        break;
+                                    }
+                                }
+                            } else { // For non-current accounts
+                                if (input > 0 || (input < 0 && Account.getBalance(currentAccount) + input >= 0)) {
+                                    Account.setBalance(currentAccount, input);
+                                } else {
+                                    if (input == 0) {
+                                        System.out.println("Cannot alter balance by 0");
+                                        scanner.nextLine();
+                                        clearScreen();
+                                        break;
+                                    } else { // negative balance
+                                        System.out.println("Insufficent funds");
+                                        scanner.nextLine();
+                                        scanner.nextLine();
+                                        clearScreen();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            /* Alteration succesfull */
+                            if (input > 0) {
+                                System.out.println("Balance of account " + Account.getCustomerName(currentAccount)
+                                        + " increased by " + input);
+                            } else {
+                                System.out.println("Balance of account " + Account.getCustomerName(currentAccount)
+                                        + " decreased by " + input);
+                            }
+                            scanner.nextLine();
+                            scanner.nextLine();
+                            clearScreen();
+                        }
+                    }
+                    if (!accountFound) {
+                        System.out.println("Account not found");
+                        scanner.nextLine();
+                        clearScreen();
+                    }
+
                     break;
                 /*
                  * Save accounts to a new bankData.csv and delete the old one
