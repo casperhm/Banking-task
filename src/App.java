@@ -231,22 +231,23 @@ public class App {
                     for (Account currentAccount : accounts) {
                         if (Integer.toString(Account.getID(currentAccount)).equals(ID)) {
                             /* Accounts match, input deposit/withdrawal */
-                            clearScreen();
-                            accountFound = true;
-                            System.out.println("Input deposit (+) or withdrawal (-)");
-                            System.out.println(
-                                    "Withdrawal limited to 5000$ and 1000$ overdraft applies only to Current accounts");
-
                             /* Check for valid input */
                             boolean validInput = false;
                             double input = 0;
                             while (!validInput) {
+                                clearScreen();
+                                accountFound = true;
+                                System.out.println("Input deposit (+) or withdrawal (-)");
+                                System.out.println(
+                                        "Withdrawal limited to 5000$ and 1000$ overdraft applies only to Current accounts");
                                 if (scanner.hasNextDouble()) {
                                     input = scanner.nextDouble();
                                     clearScreen();
                                     validInput = true;
                                 } else {
+                                    clearScreen();
                                     System.out.println("Please input a number");
+                                    scanner.nextLine();
                                     scanner.nextLine();
                                     clearScreen();
                                 }
@@ -263,7 +264,9 @@ public class App {
                                     Account.setBalance(currentAccount, input);
                                 } else { // invalid input due to input == 0 or balance - input < -1000
                                     if (input == 0) {
+                                        clearScreen();
                                         System.out.println("Cannot alter balance by 0");
+                                        scanner.nextLine();
                                         scanner.nextLine();
                                         clearScreen();
                                         break;
@@ -281,6 +284,7 @@ public class App {
                                 } else {
                                     if (input == 0) {
                                         System.out.println("Cannot alter balance by 0");
+                                        scanner.nextLine();
                                         scanner.nextLine();
                                         clearScreen();
                                         break;
@@ -391,6 +395,8 @@ public class App {
 
     /**
      * Clears the terminal window
+     * For macOS use \033[H\033[2J
+     * For blueJ on windows use \u000c
      */
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
