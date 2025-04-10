@@ -1,16 +1,33 @@
 import java.util.*;
 
+import javax.management.openmbean.OpenMBeanAttributeInfo;
+
+/**
+ * Main class
+ */
 public class App {
 
     /**
      * Interface loop for tellers
      * 
-     * @param scanner      scanner
-     * @param accounts     bankData.csv as ArrayList
-     * @param accountTypes accountTypes.txt as ArrayList
+     * @param scanner        scanner
+     * @param accounts       bankData.csv as ArrayList
+     * @param accountTypes   accountTypes.txt as ArrayList
+     * @param transactionLog for keeping track of each transaction this session
      */
-    public static void run(Scanner scanner, ArrayList<Account> accounts, ArrayList<AccountType> accountTypes) {
+    public static void run(Scanner scanner, ArrayList<Account> accounts, ArrayList<AccountType> accountTypes,
+            ArrayList<String> transactionLog) {
         Operations.clearScreen();
+
+        /* Get the total money in the system */
+        double initialTotalMoney = 0;
+        for (Account a : accounts) {
+            /* Disregard negative balances/debt */
+            if (Account.getBalance(a) > 0) {
+                initialTotalMoney += Account.getBalance(a);
+            }
+        }
+
         while (true) {
             /* Print UI */
             System.out.println("| * * Welcome Teller * * |");
@@ -19,6 +36,7 @@ public class App {
             System.out.println("Close account - 3");
             System.out.println("Get balance - 4");
             System.out.println("Alter balance - 5");
+            System.out.println("Show transaction data - 6");
 
             /* Main choice loop */
             switch (scanner.nextLine()) {
@@ -91,14 +109,47 @@ public class App {
                     account = Operations.Search(scanner, accounts);
                     if (account != null) {
                         /* Deopsit or withdraw */
-                        Operations.alterBalance(scanner, account, accountTypes);
+                        transactionLog = Operations.alterBalance(scanner, account, accountTypes, transactionLog);
                         /* Save accounts */
                         Operations.saveAccounts(accounts);
                     }
                     break;
                 /*
-                 * Invalid input
+                 * Print the total money in the bank system, the net deposit/withdrawal of the
+                 * session, and each transaction that took place in the session
                  */
+                case "6":
+                    Operations.clearScreen();
+                    /* Get the total money in the system */
+                    double finalTotalMoney = 0;
+                    for (Account a : accounts) {
+                        finalTotalMoney += Account.getBalance(a);
+                    }
+
+                    /*
+                     * Get the net money by subtracting the starting total from the final total, or
+                     * vice versa depending on which is higher
+                     */
+                    double netMoney = 0;
+                    if (initialTotalMoney < finalTotalMoney) {
+                        netMoney = finalTotalMoney - initialTotalMoney;
+                    } else {
+                        netMoney = -1 * (initialTotalMoney - finalTotalMoney);
+                    }
+
+                    /* Print the data */
+                    System.out.println("The total system balance is $" + finalTotalMoney);
+                    System.out.println("The net change from this session is " + netMoney);
+                    System.out.println();
+
+                    /* Print transaction log */
+                    for (String transactionSummary : transactionLog) {
+                        System.out.println(transactionSummary);
+                    }
+                    scanner.nextLine();
+                    Operations.clearScreen();
+                    break;
+                /* Invalid input */
                 default:
                     Operations.clearScreen();
                     System.out.println("Invalid input");
@@ -124,7 +175,10 @@ public class App {
         /* Scan csv file to create initial accounts array */
         ArrayList<Account> accounts = Operations.getAccounts(accountTypes);
 
+        /* Logs of every transaction from the session */
+        ArrayList<String> transactionLog = new ArrayList<>();
+
         /* Teller interface loop */
-        run(scanner, accounts, accountTypes);
+        run(scanner, accounts, accountTypes, transactionLog);
     }
 }

@@ -13,7 +13,7 @@ public class AccountType {
      * to add new types
      * 
      * @param name
-     * @param withdrawLimit  I think these are self-explanatory
+     * @param withdrawLimit
      * @param overdraftLimit
      */
     public AccountType(String name, String withdrawLimit, String overdraftLimit) {
@@ -25,11 +25,11 @@ public class AccountType {
     /*
      * Reads every account type from the accountTypes.txt file, returns them as an
      * ArrayList<AccountType>
-     * Does this at the start of every session meaning a system restart is required
+     * Does this at the start of every session meaning a program restart is required
      * to load new types
      */
     public static ArrayList<AccountType> getAccountTypes() {
-        ArrayList<AccountType> accountTypes = new ArrayList();
+        ArrayList<AccountType> accountTypes = new ArrayList<AccountType>();
         try {
             File file = new File("accountTypes.txt");
             Scanner scanner = new Scanner(file);

@@ -1,7 +1,9 @@
 Banking task
 
+Run App.main()
+
 How to customise account types, withdrawal limits, and overdraft limits:
-Open account_types.txt
+Open accountTypes.txt
 For every account type you want, write a line like so:
 
 name,withdrawal_limit,overdraft_limit
@@ -18,4 +20,4 @@ DO use negative numbers for overdraft limits
 New account types will require a program restart to take effect
 
 IMPORTANT -
-Feel free to alter transaction limits at will and add new types but if you REMOVE types you must manualy delete each account of that type from bankData.csv - the program cannot load an account with a type of null
+Feel free to alter transaction limits at will and add new types but if you REMOVE types you must manually delete each account of that type from bankData.csv - the program cannot load an account with a type of null

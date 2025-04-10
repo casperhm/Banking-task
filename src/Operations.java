@@ -14,7 +14,7 @@ public class Operations {
      * @return ArrayList<Account> accounts
      */
     public static ArrayList<Account> getAccounts(ArrayList<AccountType> accountTypes) {
-        ArrayList<Account> accounts = new ArrayList();
+        ArrayList<Account> accounts = new ArrayList<Account>();
         try {
             File file = new File("bankData.csv");
             Scanner scanner = new Scanner(file);
@@ -80,7 +80,9 @@ public class Operations {
      * 0$
      * 
      * Check on each input for commas as these are the split regex
-     * When creating phone number make sure is integer and not taken already
+     * When creating phone number make sure is integer and not taken already, and if
+     * phone number begins with 0 store this separately as it gets removed in
+     * conversion to double
      * 
      * @param scanner
      * @param accounts     arraylist of accounts
@@ -145,7 +147,7 @@ public class Operations {
                 }
                 /* Check phone number actually is a number */
                 if (scanner.hasNextInt()) {
-                    number = Integer.toString(scanner.nextInt());
+                    number = scanner.nextLine();
 
                     /* Check if number is taken */
                     numberTaken = false;
@@ -170,10 +172,12 @@ public class Operations {
 
             }
 
-            clearScreen();
-            System.out.println("Please do not enter , or leave field blank");
-            scanner.nextLine();
-            clearScreen();
+            if (!validInput) {
+                clearScreen();
+                System.out.println("Please do not enter , or leave field blank");
+                scanner.nextLine();
+                clearScreen();
+            }
         }
         clearScreen();
 
@@ -258,9 +262,11 @@ public class Operations {
      * type = Current then >= -1000
      * 
      * @param scanner
-     * @param account the account to deposit to / withdraw from
+     * @param account      the account to deposit to / withdraw from
+     * @param accountTypes for checking overdraft/withdrawal limits
      */
-    public static void alterBalance(Scanner scanner, Account account, ArrayList<AccountType> accountTypes) {
+    public static ArrayList<String> alterBalance(Scanner scanner, Account account,
+            ArrayList<AccountType> accountTypes, ArrayList<String> transactionLog) {
         /* Check for valid input */
         boolean validInput = false;
         double input = 0;
@@ -296,13 +302,20 @@ public class Operations {
         if ((Account.getBalance(account) + input >= overdraftLimit) && (input >= withdrawLimit)) {
             /* Alteration succesfull */
             Account.setBalance(account, input);
+
+            /* Print transaction data and add it to transaction log */
             if (input > 0) {
                 System.out.println("Balance of account " + Account.getCustomerName(account)
+                        + " increased by " + input);
+                transactionLog.add("Balance of account " + Account.getCustomerName(account)
                         + " increased by " + input);
             } else {
                 System.out.println("Balance of account " + Account.getCustomerName(account)
                         + " decreased by " + input);
+                transactionLog.add("Balance of account " + Account.getCustomerName(account)
+                        + " decreased by " + input);
             }
+
             scanner.nextLine();
             scanner.nextLine();
             clearScreen();
@@ -312,8 +325,13 @@ public class Operations {
             scanner.nextLine();
             scanner.nextLine();
             clearScreen();
-            return;
         }
+
+        /*
+         * Return transaction log with new transaction added, unless transaction was out
+         * of bounds then returns transactionLog as it came
+         */
+        return transactionLog;
     }
 
     /**
