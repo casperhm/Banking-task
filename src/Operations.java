@@ -293,7 +293,7 @@ public class Operations {
         int overdraftLimit = Integer.parseInt(AccountType.getOverdraftLimit(Account.getAccountType(account)));
 
         /* Transaction is within bounds, proceed */
-        if ((Account.getBalance(account) + input >= overdraftLimit) && (input <= withdrawLimit)) {
+        if ((Account.getBalance(account) + input >= overdraftLimit) && (input >= withdrawLimit)) {
             /* Alteration succesfull */
             Account.setBalance(account, input);
             if (input > 0) {

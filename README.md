@@ -8,11 +8,11 @@ name,withdrawal_limit,overdraft_limit
 
 So if you want a savings type account with 1000 overdraft and a 5000 withdrawal limit:
 
-savings,5000,-1000
+savings,-5000,-1000
 
 DO NOT use capital letters
 DO NOT make duplicates
-DO NOT use negative numbers for withdrawal limits
+DO use negative numbers for withdrawal limits
 DO use negative numbers for overdraft limits
 
 New account types will require a program restart to take effect
