@@ -23,7 +23,7 @@ public class Operations {
                 String line = scanner.nextLine();
                 String[] accountDetails = line.split(",");
                 accounts.add(0, new Account(accountDetails[0], accountDetails[1], accountDetails[2], accountDetails[3],
-                        accountDetails[4], accountDetails[5]));
+                        accountDetails[4]));
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -49,7 +49,7 @@ public class Operations {
             for (Account account : accounts) {
                 bw.write(Account.getCustomerName(account) + "," + Account.getAdress(account) + "," +
                         Account.getAccountNumber(account) + "," + Account.getAccountType(account) + ","
-                        + Account.getBalance(account) + "," + Account.getID(account));
+                        + Account.getBalance(account));
                 /* Insert return */
                 bw.newLine();
             }
@@ -61,18 +61,15 @@ public class Operations {
 
     /**
      * Creates a new account with chosen name, adress, number, type and balance of
-     * 0$ and gives a random account ID from identitys
-     * If no more identitys are availible the bank has reached the maximum number of
-     * accounts allowed and no more account will be created
+     * 0$
      * 
      * Check on each input for commas as these are the split regex
+     * When creating phone number make sure is integer and not taken already
      * 
      * @param scanner
-     * @param identitys an arraylist with all possible account identitys, size is
-     *                  customisable in admin mode
-     * @param accounts  arraylist of accounts
+     * @param accounts arraylist of accounts
      */
-    public static void createAccount(Scanner scanner, ArrayList<Integer> identitys, ArrayList<Account> accounts) {
+    public static void createAccount(Scanner scanner, ArrayList<Account> accounts) {
         clearScreen();
         boolean hasComma = true;
 
@@ -82,108 +79,121 @@ public class Operations {
         String number = null;
         String type = null;
 
-        /* If more accounts can be created */
-        if (identitys.size() > 0) {
-            /* Input name */
-            while (hasComma) {
-                System.out.println("Input name");
-                name = scanner.nextLine();
-                /* Check for commas, these can break things */
-                if (!name.contains(",")) {
-                    hasComma = false;
+        /* Input name */
+        /* Check for no commas and input not null */
+        while (hasComma) {
+            System.out.println("Input name");
+            name = scanner.nextLine();
+            if (!name.contains(",") && name != "") {
+                hasComma = false;
+                break;
+            }
+            clearScreen();
+            System.out.println("Please do not enter , or leave field blank");
+            scanner.nextLine();
+            clearScreen();
+        }
+        hasComma = true;
+        clearScreen();
+
+        /* Input adress */
+        /* Check for no commas and input not null */
+        while (hasComma) {
+            System.out.println("Input adress");
+            adress = scanner.nextLine();
+            /* Check for commas, these can break things */
+            if (!adress.contains(",") && adress != "") {
+                hasComma = false;
+                break;
+            }
+            clearScreen();
+            System.out.println("Please do not enter ,  or leave field blank");
+            scanner.nextLine();
+            clearScreen();
+        }
+        hasComma = true;
+        clearScreen();
+
+        /* Input phone number */
+        while (hasComma) {
+            boolean numberTaken = false;
+            boolean validInput = false;
+            while (!validInput) {
+                clearScreen();
+                if (!numberTaken) {
+                    System.out.println("Input phone number");
+                } else {
+                    System.out.println("Input unused number");
+                }
+                /* Check phone number actually is a number */
+                if (scanner.hasNextInt()) {
+                    number = Integer.toString(scanner.nextInt());
+
+                    /* Check if number is taken */
+                    numberTaken = false;
+                    for (Account account : accounts) {
+                        if (Account.getAccountNumber(account).equals(number)) {
+                            numberTaken = true;
+                        }
+                    }
+
+                    /* Check for commas, these can break things */
+                    if (!number.contains(",") && number != "" && !numberTaken) {
+                        hasComma = false;
+                        validInput = true;
+                    }
+                } else {
+                    clearScreen();
+                    System.out.println("Please input a unused number");
+                    scanner.nextLine();
+                    scanner.nextLine();
+                    clearScreen();
+                }
+
+            }
+
+            clearScreen();
+            System.out.println("Please do not enter , or leave field blank");
+            scanner.nextLine();
+            clearScreen();
+        }
+        clearScreen();
+
+        /*
+         * Select valid type from Everyday, Savings, Current
+         */
+        boolean invalidInput = true;
+        while (invalidInput) {
+            System.out.println("Input account type (Everyday/Savings/Current)");
+            switch (scanner.nextLine()) {
+                case "Everyday":
+                case "everyday":
+                    type = "Everyday";
+                    invalidInput = false;
                     break;
-                }
-                clearScreen();
-                System.out.println("Please do not enter ,");
-                scanner.nextLine();
-                clearScreen();
-            }
-            hasComma = true;
-            clearScreen();
-
-            /* Input adress */
-            while (hasComma) {
-                System.out.println("Input adress");
-                adress = scanner.nextLine();
-                /* Check for commas, these can break things */
-                if (!adress.contains(",")) {
-                    hasComma = false;
+                case "Savings":
+                case "savings":
+                    type = "Savings";
+                    invalidInput = false;
                     break;
-                }
-                clearScreen();
-                System.out.println("Please do not enter ,");
-                scanner.nextLine();
-                clearScreen();
-            }
-            hasComma = true;
-            clearScreen();
-
-            /* Input phone number */
-            while (hasComma) {
-                System.out.println("Input phone number");
-                number = scanner.nextLine();
-                /* Check for commas, these can break things */
-                if (!number.contains(",")) {
-                    hasComma = false;
+                case "Current":
+                case "current":
+                    type = "Current";
+                    invalidInput = false;
                     break;
-                }
-                clearScreen();
-                System.out.println("Please do not enter ,");
-                scanner.nextLine();
-                clearScreen();
+                default:
+                    clearScreen();
+                    System.out.println("Invalid input");
+                    scanner.nextLine();
+                    clearScreen();
+                    break;
             }
+
+            /* Create new Account and add to accounts */
+            Account account = new Account(name, adress, number, type, "0");
+            accounts.add(account);
             clearScreen();
-
-            /*
-             * Select valid type from Everyday, Savings, Current
-             */
-            boolean invalidInput = true;
-            while (invalidInput) {
-                System.out.println("Input account type (Everyday/Savings/Current)");
-                switch (scanner.nextLine()) {
-                    case "Everyday":
-                    case "everyday":
-                        type = "Everyday";
-                        invalidInput = false;
-                        break;
-                    case "Savings":
-                    case "savings":
-                        type = "Savings";
-                        invalidInput = false;
-                        break;
-                    case "Current":
-                    case "current":
-                        type = "Current";
-                        invalidInput = false;
-                        break;
-                    default:
-                        clearScreen();
-                        System.out.println("Invalid input");
-                        scanner.nextLine();
-                        clearScreen();
-                        break;
-                }
-
-                /* Get new accountID from identitys */
-                Random random = new Random();
-                int index = random.nextInt(identitys.size());
-                String accountID = Integer.toString(identitys.get(index));
-                identitys.remove(index);
-                /* Reset identitys file without this identity as it is no longer availible */
-                Admin.saveIdentitys(identitys);
-
-                /* Create new Account and add to accounts */
-                Account account = new Account(name, adress, number, type, "0",
-                        accountID);
-                accounts.add(account);
-                clearScreen();
-                System.out.println("Account " + "'" + name + "'" + " added");
-                scanner.nextLine();
-                clearScreen();
-            }
-        } else { // no more accounts can be created
-            clearScreen();
-            System.out.println("No more accounts can be created. Please enter admin mode to create more identitys");
+            System.out.println("Account " + "'" + name + "'" + " added");
             scanner.nextLine();
             clearScreen();
         }
@@ -193,23 +203,23 @@ public class Operations {
     }
 
     /**
-     * Search for an Account in accounts by accountID
+     * Search for an Account in accounts by accountNumber
      * 
      * @param scanner
      * @param accounts arraylist of accounts
-     * @return Account that matches inputed ID / null if ID is invalid
+     * @return Account that matches inputed number / null if number is invalid
      */
-    public static Account IDSearch(Scanner scanner, ArrayList<Account> accounts) {
-        String ID = null;
+    public static Account Search(Scanner scanner, ArrayList<Account> accounts) {
+        String number = null;
 
         clearScreen();
-        System.out.println("Input account ID");
-        ID = scanner.nextLine();
+        System.out.println("Input account number");
+        number = scanner.nextLine();
         clearScreen();
 
         /* Scan accounts for matches and remove if found */
         for (Account currentAccount : accounts) {
-            if (Integer.toString(Account.getID(currentAccount)).equals(ID)) {
+            if (Account.getAccountNumber(currentAccount).equals(number)) {
                 return currentAccount;
             }
         }

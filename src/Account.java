@@ -4,7 +4,6 @@ public class Account {
     private String adress;
     private String accountType; // Savings, Everyday, or Current
     private double balance; // converted to double in constructor
-    private int accountID; // converted to int in constructor
 
     /**
      * Create fresh account
@@ -14,16 +13,13 @@ public class Account {
      * @param adress        customer adress
      * @param accountType   Savings, Everyday, or Current
      * @param balance       starting balance
-     * @param accountID     unique account number
      */
-    public Account(String customerName, String adress, String accountNumber, String accountType, String balance,
-            String accountID) {
+    public Account(String customerName, String adress, String accountNumber, String accountType, String balance) {
         this.customerName = customerName;
         this.accountNumber = accountNumber;
         this.adress = adress;
         this.accountType = accountType;
         this.balance = Double.parseDouble(balance);
-        this.accountID = Integer.parseInt(accountID);
     }
 
     /* Getters */
@@ -45,10 +41,6 @@ public class Account {
 
     public static double getBalance(Account account) {
         return account.balance;
-    }
-
-    public static int getID(Account account) {
-        return account.accountID;
     }
 
     /* Setters */

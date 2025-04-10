@@ -1,1 +1,14 @@
 Banking task
+
+How to customise account types, withdrawal limits, and overdraft limits:
+Open account_types.txt
+For every account type you want, write a line like so:
+
+name,withdrawal_limit,overdraft_limit
+
+So if you want a savings type account with 1000 overdraft and a 5000 withdrawal limit:
+
+savings,-5000,-1000
+
+DO NOT use capital letters
+DO use negative numbers for withdrawal and overdraft limits

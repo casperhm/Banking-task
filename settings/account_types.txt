@@ -1,3 +1,0 @@
-everyday, 0
-savings, 0
-current, -1000
