@@ -260,15 +260,21 @@ public class Operations {
      * @param scanner
      * @param account the account to deposit to / withdraw from
      */
-    public static void alterBalance(Scanner scanner, Account account) {
+    public static void alterBalance(Scanner scanner, Account account, ArrayList<AccountType> accountTypes) {
         /* Check for valid input */
         boolean validInput = false;
         double input = 0;
         while (!validInput) {
             clearScreen();
             System.out.println("Input deposit (+) or withdrawal (-)");
-            System.out.println(
-                    "Withdrawal limited to 5000$ and 1000$ overdraft applies only to Current accounts");
+
+            /* Print transaction limits */
+            for (AccountType accountType : accountTypes) {
+                System.out.println(AccountType.getName(accountType) + " has a withdrawal limit of "
+                        + AccountType.getWithdrawLimit(accountType) + " and a overdraft limit of "
+                        + AccountType.getOverdraftLimit(accountType));
+            }
+
             if (scanner.hasNextDouble()) {
                 input = scanner.nextDouble();
                 clearScreen();
@@ -282,62 +288,14 @@ public class Operations {
             }
         }
 
-        /*
-         * Alter balance for Current accounts
-         * input > 0
-         * input <= account balance
-         */
-        boolean transactionSuccesfull = false;
-        if (Account.getAccountType(account).equals("Current")) {
-            if (input > 0
-                    || (input < 0 && (Account.getBalance(account) + 1000) + input >= 0) && input >= -5000) {
-                Account.setBalance(account, input);
-                transactionSuccesfull = true;
-            } else { // invalid input due to input == 0 or balance - input < -1000 or input <= -5000
-                if (input == 0) {
-                    clearScreen();
-                    System.out.println("Cannot alter balance by 0");
-                    scanner.nextLine();
-                    scanner.nextLine();
-                    clearScreen();
-                } else if (input <= -5000) { // withdrawal limit exceeded
-                    System.out.println("This exceeds the withdrawal limit of $5000");
-                    scanner.nextLine();
-                    scanner.nextLine();
-                    clearScreen();
-                } else { // overdraft limit exceded
-                    System.out.println("This exceeds the overdraft limit of $1000");
-                    scanner.nextLine();
-                    scanner.nextLine();
-                    clearScreen();
-                }
-            }
-        } else { // For non-current accounts
-            if (input > 0 || (input < 0 && Account.getBalance(account) + input >= 0) && input >= -5000) {
-                Account.setBalance(account, input);
-                transactionSuccesfull = true;
-            } else { // invalid input due to input == 0 or balance - input < -1000 or input <= -5000
-                if (input == 0) {
-                    System.out.println("Cannot alter balance by 0");
-                    scanner.nextLine();
-                    scanner.nextLine();
-                    clearScreen();
-                } else if (input <= -5000) { // withdrawal limit exceeded
-                    System.out.println("This exceeds the withdrawal limit of $5000");
-                    scanner.nextLine();
-                    scanner.nextLine();
-                    clearScreen();
-                } else { // negative balance
-                    System.out.println("Insufficent funds");
-                    scanner.nextLine();
-                    scanner.nextLine();
-                    clearScreen();
-                }
-            }
-        }
+        /* Alter balance by input, within bounds of withdrawal/overdraft limits */
+        int withdrawLimit = Integer.parseInt(AccountType.getWithdrawLimit(Account.getAccountType(account)));
+        int overdraftLimit = Integer.parseInt(AccountType.getOverdraftLimit(Account.getAccountType(account)));
 
-        /* Alteration succesfull */
-        if (transactionSuccesfull) {
+        /* Transaction is within bounds, proceed */
+        if ((Account.getBalance(account) + input >= overdraftLimit) && (input <= withdrawLimit)) {
+            /* Alteration succesfull */
+            Account.setBalance(account, input);
             if (input > 0) {
                 System.out.println("Balance of account " + Account.getCustomerName(account)
                         + " increased by " + input);
@@ -348,6 +306,13 @@ public class Operations {
             scanner.nextLine();
             scanner.nextLine();
             clearScreen();
+        } else {
+            clearScreen();
+            System.out.println("Transaction is not within bounds");
+            scanner.nextLine();
+            scanner.nextLine();
+            clearScreen();
+            return;
         }
     }
 

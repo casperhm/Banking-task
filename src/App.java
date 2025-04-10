@@ -91,7 +91,9 @@ public class App {
                     account = Operations.Search(scanner, accounts);
                     if (account != null) {
                         /* Deopsit or withdraw */
-                        Operations.alterBalance(scanner, account);
+                        Operations.alterBalance(scanner, account, accountTypes);
+                        /* Save accounts */
+                        Operations.saveAccounts(accounts);
                     }
                     break;
                 /*
