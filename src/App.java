@@ -5,10 +5,11 @@ public class App {
     /**
      * Interface loop for tellers
      * 
-     * @param scanner  scanner
-     * @param accounts bankData.csv as ArrayList
+     * @param scanner      scanner
+     * @param accounts     bankData.csv as ArrayList
+     * @param accountTypes accountTypes.txt as ArrayList
      */
-    public static void run(Scanner scanner, ArrayList<Account> accounts) {
+    public static void run(Scanner scanner, ArrayList<Account> accounts, ArrayList<AccountType> accountTypes) {
         Operations.clearScreen();
         while (true) {
             /* Print UI */
@@ -30,7 +31,8 @@ public class App {
                     for (Account account : accounts) {
                         System.out.println(Account.getCustomerName(account) + ", " + Account.getAdress(account)
                                 + ", " +
-                                Account.getAccountNumber(account) + ", " + Account.getAccountType(account) + ", " +
+                                Account.getAccountNumber(account) + ", "
+                                + AccountType.getName(Account.getAccountType(account)) + ", " +
                                 Account.getBalance(account));
                     }
                     scanner.nextLine();
@@ -42,7 +44,7 @@ public class App {
                  * Check on each input for commas as these are the split regex
                  */
                 case "2":
-                    Operations.createAccount(scanner, accounts);
+                    Operations.createAccount(scanner, accounts, accountTypes);
                     break;
                 /*
                  * Search for an account by number and delete it
@@ -113,10 +115,14 @@ public class App {
     public static void main(String args[]) throws Exception {
         Operations.clearScreen();
         Scanner scanner = new Scanner(System.in);
+
+        /* Scan accountTypes.txt for possible account varietys */
+        ArrayList<AccountType> accountTypes = AccountType.getAccountTypes();
+
         /* Scan csv file to create initial accounts array */
-        ArrayList<Account> accounts = Operations.getAccounts();
+        ArrayList<Account> accounts = Operations.getAccounts(accountTypes);
 
         /* Teller interface loop */
-        run(scanner, accounts);
+        run(scanner, accounts, accountTypes);
     }
 }

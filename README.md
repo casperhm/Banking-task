@@ -11,4 +11,7 @@ So if you want a savings type account with 1000 overdraft and a 5000 withdrawal 
 savings,-5000,-1000
 
 DO NOT use capital letters
+DO NOT make duplicates
 DO use negative numbers for withdrawal and overdraft limits
+
+New account types will require a program restart to take effect

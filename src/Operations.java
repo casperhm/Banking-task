@@ -13,7 +13,7 @@ public class Operations {
      * 
      * @return ArrayList<Account> accounts
      */
-    public static ArrayList<Account> getAccounts() {
+    public static ArrayList<Account> getAccounts(ArrayList<AccountType> accountTypes) {
         ArrayList<Account> accounts = new ArrayList();
         try {
             File file = new File("bankData.csv");
@@ -22,8 +22,23 @@ public class Operations {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] accountDetails = line.split(",");
-                accounts.add(0, new Account(accountDetails[0], accountDetails[1], accountDetails[2], accountDetails[3],
-                        accountDetails[4]));
+                AccountType type = null;
+                /*
+                 * Find the transaction limits of the named accountType (accountDetails[3]) in
+                 * the file and create a new AccountType object to make an Account with
+                 */
+                /* Find the transaction limits from accountTypes */
+                for (AccountType accountType : accountTypes) {
+                    /* AccountType match */
+                    if (accountDetails[3].equals(AccountType.getName(accountType))) {
+                        type = new AccountType(accountDetails[3], AccountType.getWithdrawLimit(accountType),
+                                AccountType.getOverdraftLimit(accountType));
+                    }
+                }
+
+                /* Add new account */
+                accounts.add(
+                        new Account(accountDetails[0], accountDetails[1], accountDetails[2], type, accountDetails[4]));
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -48,7 +63,8 @@ public class Operations {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             for (Account account : accounts) {
                 bw.write(Account.getCustomerName(account) + "," + Account.getAdress(account) + "," +
-                        Account.getAccountNumber(account) + "," + Account.getAccountType(account) + ","
+                        Account.getAccountNumber(account) + "," + AccountType.getName(Account.getAccountType(account))
+                        + ","
                         + Account.getBalance(account));
                 /* Insert return */
                 bw.newLine();
@@ -67,9 +83,11 @@ public class Operations {
      * When creating phone number make sure is integer and not taken already
      * 
      * @param scanner
-     * @param accounts arraylist of accounts
+     * @param accounts     arraylist of accounts
+     * @param accountTypes each possible account type from txt file
      */
-    public static void createAccount(Scanner scanner, ArrayList<Account> accounts) {
+    public static void createAccount(Scanner scanner, ArrayList<Account> accounts,
+            ArrayList<AccountType> accountTypes) {
         clearScreen();
         boolean hasComma = true;
 
@@ -77,7 +95,7 @@ public class Operations {
         String name = null;
         String adress = null;
         String number = null;
-        String type = null;
+        AccountType type = null;
 
         /* Input name */
         /* Check for no commas and input not null */
@@ -160,43 +178,45 @@ public class Operations {
         clearScreen();
 
         /*
-         * Select valid type from Everyday, Savings, Current
+         * Choose account type
+         * First print all possible account types
+         * Then pick one
          */
-        boolean invalidInput = true;
-        while (invalidInput) {
-            System.out.println("Input account type (Everyday/Savings/Current)");
-            switch (scanner.nextLine()) {
-                case "Everyday":
-                case "everyday":
-                    type = "Everyday";
-                    invalidInput = false;
-                    break;
-                case "Savings":
-                case "savings":
-                    type = "Savings";
-                    invalidInput = false;
-                    break;
-                case "Current":
-                case "current":
-                    type = "Current";
-                    invalidInput = false;
-                    break;
-                default:
-                    clearScreen();
-                    System.out.println("Invalid input");
-                    scanner.nextLine();
-                    clearScreen();
-                    break;
+        String input = null;
+
+        boolean validAccountType = false;
+        while (!validAccountType) {
+            /* Print all account types */
+            clearScreen();
+            System.out.println("Choose from possible account types:");
+            for (AccountType accountType : accountTypes) {
+                System.out.println(AccountType.getName(accountType));
             }
 
-            /* Create new Account and add to accounts */
-            Account account = new Account(name, adress, number, type, "0");
-            accounts.add(account);
-            clearScreen();
-            System.out.println("Account " + "'" + name + "'" + " added");
-            scanner.nextLine();
-            clearScreen();
+            input = scanner.nextLine();
+            /* Check input is a valid account type */
+            for (AccountType accountType : accountTypes) {
+                if (input.equals(AccountType.getName(accountType))) {
+                    type = accountType;
+                    validAccountType = true;
+                }
+            }
+
+            /* If is invalid */
+            if (type == null) {
+                clearScreen();
+                System.out.println("Invalid account type");
+                scanner.nextLine();
+            }
         }
+
+        /* Create new Account and add to accounts */
+        Account account = new Account(name, adress, number, type, "0");
+        accounts.add(account);
+        clearScreen();
+        System.out.println("Account " + "'" + name + "'" + " added");
+        scanner.nextLine();
+        clearScreen();
 
         /* Save the account */
         saveAccounts(accounts);

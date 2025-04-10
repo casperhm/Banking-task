@@ -2,7 +2,7 @@ public class Account {
     private String customerName;
     private String accountNumber; // phone number (String because -)
     private String adress;
-    private String accountType; // Savings, Everyday, or Current
+    private AccountType accountType;
     private double balance; // converted to double in constructor
 
     /**
@@ -14,7 +14,7 @@ public class Account {
      * @param accountType   Savings, Everyday, or Current
      * @param balance       starting balance
      */
-    public Account(String customerName, String adress, String accountNumber, String accountType, String balance) {
+    public Account(String customerName, String adress, String accountNumber, AccountType accountType, String balance) {
         this.customerName = customerName;
         this.accountNumber = accountNumber;
         this.adress = adress;
@@ -35,7 +35,7 @@ public class Account {
         return account.adress;
     }
 
-    public static String getAccountType(Account account) {
+    public static AccountType getAccountType(Account account) {
         return account.accountType;
     }
 
